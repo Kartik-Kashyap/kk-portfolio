@@ -9,6 +9,7 @@ Hi, I'm **Kartik Kashyap** — a B.Tech IT student who accidentally became a pro
 While normal people were making todo apps, I was out here encrypting chain-of-custody logs for brainwave evidence and teaching kids about supply chains by letting them virtually manufacture a pen. Priorities.
 
 ### What even is this website?
+(live preview here, best viewed on desktop though: https://kartik-kashyap-portfolio.netlify.app/)
 
 It's less of a portfolio and more of a **digital evidence locker** for my brain.
 
