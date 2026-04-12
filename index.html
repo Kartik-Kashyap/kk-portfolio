@@ -1,0 +1,2098 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kartik Kashyap — Creative Technologist</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Orbitron:wght@400;700;900&display=swap"
+    rel="stylesheet">
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+<!-- <link rel="alternate icon" type="image/png" href="favicon.png"> <link rel="mask-icon" href="favicon.svg" color="#c9913a"> -->
+  <!-- <link href="styles.css" rel="stylesheet"> -->
+  <style>
+    :root {
+      --bg: #0a0905;
+      --bg2: #111009;
+      --ink: #e8dfc8;
+      --ink-dim: #8a7d65;
+      --ink-faint: #3a3328;
+      --amber: #c9913a;
+      --amber-glow: #e8a84a;
+      --coral: #c4614a;
+      --sage: #6b8f71;
+      --steel: #4a6a7a;
+      --paper: #1a1710;
+      --card: #130f09;
+      --border: rgba(201, 145, 58, 0.2);
+      --glow: rgba(201, 145, 58, 0.08);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--ink);
+      font-family: 'Space Mono', monospace;
+      cursor: none;
+      overflow-x: hidden;
+    }
+
+    /* Base color for all links */
+  a { color: rgb(0, 144, 172); text-decoration: none; }
+
+  /* Color when the user hovers over the link */
+  a:hover { color: rgb(195, 134, 20); }
+
+  /* Color after the link has been clicked (visited) */
+  /* a:visited { color: rgb(110, 37, 146); } */
+
+  /* Color while the link is being clicked (active) */
+  a:active { color: rgb(15, 110, 99); }
+
+    /* CUSTOM CURSOR */
+    #cursor {
+      position: fixed;
+      width: 12px;
+      height: 12px;
+      background: var(--amber);
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 9999;
+      transform: translate(-50%, -50%);
+      transition: width 0.2s, height 0.2s, background 0.2s;
+      mix-blend-mode: screen;
+    }
+
+    #cursor-ring {
+      position: fixed;
+      width: 36px;
+      height: 36px;
+      border: 1px solid rgba(201, 145, 58, 0.5);
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 9998;
+      transform: translate(-50%, -50%);
+      transition: transform 0.1s ease, width 0.3s, height 0.3s, border-color 0.3s;
+    }
+
+    body:has(a:hover) #cursor,
+    body:has(button:hover) #cursor {
+      width: 20px;
+      height: 20px;
+      background: var(--amber-glow);
+    }
+
+    body:has(a:hover) #cursor-ring,
+    body:has(button:hover) #cursor-ring {
+      width: 60px;
+      height: 60px;
+      border-color: var(--amber);
+    }
+
+    /* NOISE OVERLAY */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 9997;
+      opacity: 0.6;
+    }
+
+    /* CANVAS */
+    #neural-canvas {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      opacity: 0.35;
+    }
+
+    /* =================== ENTRY SCREEN =================== */
+    #entry {
+      position: fixed;
+      inset: 0;
+      z-index: 1000;
+      background: var(--bg);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      transition: opacity 1.2s ease, transform 1.2s ease;
+    }
+
+    #entry.exit {
+      opacity: 0;
+      transform: scale(1.05);
+      pointer-events: none;
+    }
+
+    .entry-glitch {
+      font-family: 'Orbitron', monospace;
+      font-size: clamp(10px, 1.2vw, 14px);
+      letter-spacing: 0.4em;
+      color: var(--amber);
+      text-transform: uppercase;
+      margin-bottom: 3rem;
+      opacity: 0;
+      animation: fadeUp 1s 0.5s forwards;
+    }
+
+    .entry-title {
+      font-family: 'Libre Baskerville', serif;
+      font-size: clamp(2.5rem, 7vw, 6rem);
+      font-weight: 700;
+      text-align: center;
+      line-height: 1.1;
+      color: var(--ink);
+      opacity: 0;
+      animation: fadeUp 1s 0.8s forwards;
+      letter-spacing: -0.02em;
+    }
+
+    .entry-title em {
+      font-style: italic;
+      color: var(--amber);
+    }
+
+    .entry-sub {
+      margin-top: 1.5rem;
+      font-size: 13px;
+      color: var(--ink-dim);
+      text-align: center;
+      max-width: 500px;
+      line-height: 1.8;
+      opacity: 0;
+      animation: fadeUp 1s 1.1s forwards;
+    }
+
+    .entry-btn {
+      margin-top: 3rem;
+      padding: 1rem 3rem;
+      border: 1px solid var(--amber);
+      background: transparent;
+      color: var(--amber);
+      font-family: 'Orbitron', monospace;
+      font-size: 11px;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      cursor: none;
+      position: relative;
+      overflow: hidden;
+      opacity: 0;
+      animation: fadeUp 1s 1.4s forwards;
+      transition: color 0.3s, background 0.3s;
+    }
+
+    .entry-btn::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: var(--amber);
+      transform: translateX(-100%);
+      transition: transform 0.4s ease;
+    }
+
+    .entry-btn:hover {
+      color: var(--bg);
+    }
+
+    .entry-btn:hover::before {
+      transform: translateX(0);
+    }
+
+    .entry-btn span {
+      position: relative;
+      z-index: 1;
+    }
+
+    .entry-flicker {
+      position: absolute;
+      bottom: 2rem;
+      font-size: 11px;
+      color: var(--ink-faint);
+      letter-spacing: 0.2em;
+      animation: flicker 3s infinite;
+    }
+
+    /* =================== MAIN CONTENT =================== */
+    #main {
+      position: relative;
+      z-index: 1;
+      opacity: 0;
+      transition: opacity 0.8s ease;
+    }
+
+    #main.visible {
+      opacity: 1;
+    }
+
+    /* NAV */
+    nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 500;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1.5rem 3rem;
+      backdrop-filter: blur(20px);
+      background: linear-gradient(to bottom, rgba(10, 9, 5, 0.95), transparent);
+      border-bottom: 1px solid transparent;
+      transition: border-color 0.3s;
+    }
+
+    nav.scrolled {
+      border-color: var(--border);
+    }
+
+    .nav-logo {
+      font-family: 'Orbitron', monospace;
+      font-size: 11px;
+      letter-spacing: 0.3em;
+      color: var(--amber);
+      text-decoration: none;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 2.5rem;
+      list-style: none;
+    }
+
+    .nav-links a {
+      font-size: 10px;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--ink-dim);
+      text-decoration: none;
+      transition: color 0.3s;
+      position: relative;
+    }
+
+    .nav-links a::after {
+      content: '';
+      position: absolute;
+      bottom: -4px;
+      left: 0;
+      width: 0;
+      height: 1px;
+      background: var(--amber);
+      transition: width 0.3s;
+    }
+
+    .nav-links a:hover {
+      color: var(--amber);
+    }
+
+    .nav-links a:hover::after {
+      width: 100%;
+    }
+
+    /* SECTIONS */
+    section {
+      min-height: 100vh;
+      position: relative;
+      padding: 6rem 0;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 3rem;
+    }
+
+    .section-label {
+      font-family: 'Orbitron', monospace;
+      font-size: 10px;
+      letter-spacing: 0.4em;
+      color: var(--amber);
+      text-transform: uppercase;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .section-label::before {
+      content: '';
+      width: 30px;
+      height: 1px;
+      background: var(--amber);
+    }
+
+    .section-title {
+      font-family: 'Libre Baskerville', serif;
+      font-size: clamp(2rem, 4vw, 3.5rem);
+      line-height: 1.15;
+      color: var(--ink);
+      margin-bottom: 1.5rem;
+    }
+
+    /* =================== HERO =================== */
+    #hero {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      padding-top: 8rem;
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4rem;
+      align-items: center;
+    }
+
+    .hero-tag {
+      font-family: 'Orbitron', monospace;
+      font-size: 10px;
+      letter-spacing: 0.4em;
+      color: var(--amber);
+      text-transform: uppercase;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 1.5rem;
+      padding: 0.4rem 0.8rem;
+      border: 1px solid var(--border);
+      background: var(--glow);
+    }
+
+    .hero-tag::before {
+      content: '●';
+      font-size: 6px;
+      animation: pulse 2s infinite;
+    }
+
+    .hero-name {
+      font-family: 'Libre Baskerville', serif;
+      font-size: clamp(3rem, 6vw, 5.5rem);
+      font-weight: 700;
+      line-height: 1.05;
+      color: var(--ink);
+      letter-spacing: -0.02em;
+    }
+
+    .hero-name .first {
+      display: block;
+      color: var(--ink-dim);
+      font-style: italic;
+      font-size: 0.7em;
+    }
+
+    .hero-name .last {
+      display: block;
+    }
+
+    .hero-desc {
+      margin-top: 2rem;
+      font-size: 13px;
+      line-height: 2;
+      color: var(--ink-dim);
+      max-width: 450px;
+      border-left: 2px solid var(--amber);
+      padding-left: 1.5rem;
+    }
+
+    .hero-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-top: 2rem;
+    }
+
+    .htag {
+      font-size: 10px;
+      letter-spacing: 0.15em;
+      padding: 0.3rem 0.8rem;
+      border: 1px solid var(--ink-faint);
+      color: var(--ink-dim);
+      text-transform: uppercase;
+      transition: border-color 0.3s, color 0.3s;
+    }
+
+    .htag:hover {
+      border-color: var(--amber);
+      color: var(--amber);
+    }
+
+    .hero-ctas {
+      display: flex;
+      gap: 1rem;
+      margin-top: 2.5rem;
+      flex-wrap: wrap;
+    }
+
+    .btn-primary {
+      padding: 0.9rem 2rem;
+      background: var(--amber);
+      color: var(--bg);
+      font-family: 'Orbitron', monospace;
+      font-size: 10px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      text-decoration: none;
+      transition: background 0.3s, transform 0.2s;
+      display: inline-block;
+    }
+
+    .btn-primary:hover {
+      background: var(--amber-glow);
+      transform: translateY(-2px);
+    }
+
+    .btn-ghost {
+      padding: 0.9rem 2rem;
+      border: 1px solid var(--border);
+      color: var(--ink-dim);
+      font-family: 'Orbitron', monospace;
+      font-size: 10px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      text-decoration: none;
+      transition: border-color 0.3s, color 0.3s, transform 0.2s;
+      display: inline-block;
+    }
+
+    .btn-ghost:hover {
+      border-color: var(--amber);
+      color: var(--amber);
+      transform: translateY(-2px);
+    }
+
+    /* HERO PHOTO */
+    .hero-photo-wrap {
+      position: relative;
+      display: flex;
+      justify-content: flex-end;
+      perspective: 1200px;           /* ← This creates the 3D depth */
+  perspective-origin: 50% 50%;
+    }
+
+    .hero-photo-inner {
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;   /* helps with any inner layers */
+  transition: transform 0.15s ease-out;
+  /* You can add a slight scale on hover if you want */
+}
+
+    .hero-photo-frame {
+      position: relative;
+      width: 380px;
+      height: 480px;
+      transition: transform 0.1s ease-out;
+    }
+
+    .hero-photo-frame::before {
+      content: '';
+      position: absolute;
+      inset: -12px;
+      border: 1px solid var(--border);
+      z-index: 0;
+    }
+
+    .hero-photo-frame::after {
+      content: '';
+      position: absolute;
+      inset: -6px;
+      border: 1px solid var(--amber);
+      opacity: 0.3;
+      z-index: 0;
+    }
+
+    .hero-photo-frame img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center top;
+      filter: grayscale(30%) contrast(1.1) brightness(0.9);
+      position: relative;
+      z-index: 1;
+      display: block;
+    }
+
+    .hero-photo-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to bottom, transparent 60%, rgba(201, 145, 58, 0.15));
+      z-index: 2;
+      pointer-events: none;
+      /* margin-bottom: 5px; */
+    }
+
+    .hero-photo-label {
+      position: absolute;
+      bottom: -1.5rem;
+      right: 0;
+      font-family: 'Orbitron', monospace;
+      font-size: 9px;
+      letter-spacing: 0.3em;
+      color: var(--amber);
+      text-transform: uppercase;
+      z-index: 3;
+    }
+
+    .hero-decorations {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      pointer-events: none;
+    }
+
+    .hdec {
+      position: absolute;
+      font-size: 9px;
+      letter-spacing: 0.15em;
+      color: var(--ink-faint);
+      writing-mode: vertical-rl;
+    }
+
+    .hdec-1 {
+      top: 20%;
+      left: -60px;
+    }
+
+    .hdec-2 {
+      bottom: 20%;
+      right: -60px;
+    }
+
+    /* STATS */
+    .hero-stats {
+      display: flex;
+      gap: 3rem;
+      margin-top: 3rem;
+      padding-top: 2rem;
+      border-top: 1px solid var(--ink-faint);
+    }
+
+    .stat-num {
+      font-family: 'Orbitron', monospace;
+      font-size: 1.8rem;
+      color: var(--amber);
+      font-weight: 700;
+    }
+
+    .stat-label {
+      font-size: 10px;
+      letter-spacing: 0.2em;
+      color: var(--ink-dim);
+      text-transform: uppercase;
+      margin-top: 0.2rem;
+    }
+
+    /* =================== SYSTEMS / PROJECTS =================== */
+    #systems {
+      background: var(--paper);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .projects-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+      gap: 1px;
+      background: var(--ink-faint);
+      border: 1px solid var(--ink-faint);
+      margin-top: 4rem;
+    }
+
+    .project-card {
+      background: var(--card);
+      padding: 2rem;
+      position: relative;
+      overflow: hidden;
+      cursor: none;
+      transition: background 0.3s;
+      text-decoration: none;
+      display: block;
+      color: inherit;
+    }
+
+    .project-card:hover {
+      background: #1a1508;
+    }
+
+    .project-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 2px;
+      background: linear-gradient(to right, transparent, var(--amber), transparent);
+      transform: scaleX(0);
+      transition: transform 0.4s ease;
+    }
+
+    .project-card:hover::before {
+      transform: scaleX(1);
+    }
+
+    .project-type {
+      font-family: 'Orbitron', monospace;
+      font-size: 9px;
+      letter-spacing: 0.3em;
+      color: var(--amber);
+      text-transform: uppercase;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .project-type::before {
+      content: '//';
+      color: var(--ink-faint);
+    }
+
+    .project-name {
+      font-family: 'Libre Baskerville', serif;
+      font-size: 1.3rem;
+      color: var(--ink);
+      margin-bottom: 0.8rem;
+      line-height: 1.3;
+    }
+
+    .project-desc {
+      font-size: 12px;
+      line-height: 1.8;
+      color: var(--ink-dim);
+      margin-bottom: 1.5rem;
+    }
+
+    .project-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .ptag {
+      font-size: 9px;
+      letter-spacing: 0.15em;
+      padding: 0.2rem 0.5rem;
+      background: var(--bg);
+      border: 1px solid var(--ink-faint);
+      color: var(--ink-dim);
+      text-transform: uppercase;
+    }
+
+    .project-stat {
+      font-family: 'Orbitron', monospace;
+      font-size: 10px;
+      color: var(--amber);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .project-stat::before {
+      content: '▲';
+      font-size: 7px;
+    }
+
+    .project-link {
+      position: absolute;
+      bottom: 1.5rem;
+      right: 1.5rem;
+      font-family: 'Orbitron', monospace;
+      font-size: 9px;
+      letter-spacing: 0.2em;
+      color: var(--ink-faint);
+      text-transform: uppercase;
+      transition: color 0.3s;
+    }
+
+    .project-card:hover .project-link {
+      color: var(--amber);
+    }
+
+    /* FEATURED PROJECT */
+    .project-card.featured {
+      grid-column: span 2;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+      align-items: center;
+      background: linear-gradient(135deg, #1a1508 0%, var(--card) 100%);
+      border: 1px solid rgba(201, 145, 58, 0.3);
+    }
+
+    .project-card.featured .project-name {
+      font-size: 1.8rem;
+    }
+
+    .featured-badge {
+      display: inline-block;
+      padding: 0.2rem 0.6rem;
+      background: var(--amber);
+      color: var(--bg);
+      font-family: 'Orbitron', monospace;
+      font-size: 8px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      margin-bottom: 0.8rem;
+    }
+
+    .featured-visual {
+      height: 200px;
+      background: repeating-linear-gradient(90deg,
+          transparent,
+          transparent 40px,
+          rgba(201, 145, 58, 0.05) 40px,
+          rgba(201, 145, 58, 0.05) 41px),
+        repeating-linear-gradient(0deg,
+          transparent,
+          transparent 40px,
+          rgba(201, 145, 58, 0.05) 40px,
+          rgba(201, 145, 58, 0.05) 41px);
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Orbitron', monospace;
+      font-size: 11px;
+      letter-spacing: 0.2em;
+      color: var(--amber);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .featured-visual::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 50% 50%, rgba(201, 145, 58, 0.1), transparent 70%);
+      animation: pulse-glow 3s infinite;
+    }
+
+    /* =================== THINKING LAB =================== */
+    #thinking {
+      position: relative;
+    }
+
+    #graph-canvas {
+      width: 100%;
+      height: 500px;
+      border: 1px solid var(--border);
+      background: var(--card);
+      margin-top: 3rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .thought-tooltip {
+      position: absolute;
+      background: var(--paper);
+      border: 1px solid var(--amber);
+      padding: 1rem 1.5rem;
+      max-width: 250px;
+      pointer-events: none;
+      z-index: 10;
+      display: none;
+      font-size: 12px;
+      line-height: 1.7;
+      color: var(--ink-dim);
+    }
+
+    .thought-tooltip strong {
+      display: block;
+      color: var(--amber);
+      font-family: 'Orbitron', monospace;
+      font-size: 10px;
+      letter-spacing: 0.2em;
+      margin-bottom: 0.5rem;
+    }
+
+    /* =================== ABOUT =================== */
+    #about {
+      background: var(--paper);
+      border-top: 1px solid var(--border);
+    }
+
+    .about-layout {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6rem;
+      align-items: start;
+      margin-top: 4rem;
+    }
+
+    .about-narrative {
+      font-family: 'Libre Baskerville', serif;
+      font-size: 1.1rem;
+      line-height: 1.9;
+      color: var(--ink-dim);
+    }
+
+    .about-narrative .highlight {
+      color: var(--ink);
+      font-style: italic;
+    }
+
+    .about-narrative p+p {
+      margin-top: 1.5rem;
+    }
+
+    .timeline {
+      position: relative;
+      padding-left: 1.5rem;
+      border-left: 1px solid var(--border);
+    }
+
+    .timeline-item {
+      margin-bottom: 2.5rem;
+      position: relative;
+    }
+
+    .timeline-item::before {
+      content: '';
+      position: absolute;
+      left: -1.57rem;
+      top: 0.4rem;
+      width: 8px;
+      height: 8px;
+      border: 1px solid var(--amber);
+      background: var(--bg);
+      transform: rotate(45deg);
+    }
+
+    .tl-date {
+      font-family: 'Orbitron', monospace;
+      font-size: 9px;
+      letter-spacing: 0.3em;
+      color: var(--amber);
+      margin-bottom: 0.3rem;
+      text-transform: uppercase;
+    }
+
+    .tl-role {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--ink);
+      margin-bottom: 0.2rem;
+    }
+
+    .tl-org {
+      font-size: 11px;
+      color: var(--ink-dim);
+      letter-spacing: 0.1em;
+    }
+
+    .tl-desc {
+      font-size: 11px;
+      color: var(--ink-faint);
+      margin-top: 0.5rem;
+      line-height: 1.7;
+    }
+
+    /* =================== RESEARCH =================== */
+    #research {
+      border-top: 1px solid var(--border);
+    }
+
+    .research-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+      margin-top: 4rem;
+    }
+
+    .case-file {
+      border: 1px solid var(--border);
+      background: var(--card);
+      padding: 2rem;
+      position: relative;
+      transition: border-color 0.3s, transform 0.3s;
+      text-decoration: none;
+      color: inherit;
+      display: block;
+    }
+
+    .case-file:hover {
+      border-color: var(--amber);
+      transform: translateY(-4px);
+    }
+
+    .case-id {
+      font-family: 'Orbitron', monospace;
+      font-size: 9px;
+      letter-spacing: 0.3em;
+      color: var(--ink-faint);
+      margin-bottom: 1rem;
+      text-transform: uppercase;
+    }
+
+    .case-title {
+      font-family: 'Libre Baskerville', serif;
+      font-size: 1.1rem;
+      color: var(--ink);
+      margin-bottom: 0.8rem;
+      line-height: 1.4;
+    }
+
+    .case-body {
+      font-size: 11px;
+      line-height: 1.8;
+      color: var(--ink-dim);
+    }
+
+    .case-status {
+      position: absolute;
+      top: 1.5rem;
+      right: 1.5rem;
+      font-family: 'Orbitron', monospace;
+      font-size: 8px;
+      letter-spacing: 0.2em;
+      padding: 0.2rem 0.5rem;
+      text-transform: uppercase;
+    }
+
+    .status-pub {
+      border: 1px solid var(--sage);
+      color: var(--sage);
+    }
+
+    .status-active {
+      border: 1px solid var(--amber);
+      color: var(--amber);
+    }
+
+    .status-complete {
+      border: 1px solid var(--steel);
+      color: var(--steel);
+    }
+
+    /* =================== SKILLS =================== */
+    #skills {
+      background: var(--paper);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .skills-layout {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2rem;
+      margin-top: 4rem;
+    }
+
+    .skill-group {
+      padding: 2rem;
+      border: 1px solid var(--ink-faint);
+      background: var(--card);
+      transition: border-color 0.3s;
+    }
+
+    .skill-group:hover {
+      border-color: var(--border);
+    }
+
+    .sg-label {
+      font-family: 'Orbitron', monospace;
+      font-size: 9px;
+      letter-spacing: 0.3em;
+      color: var(--amber);
+      text-transform: uppercase;
+      margin-bottom: 1.5rem;
+      padding-bottom: 0.8rem;
+      border-bottom: 1px solid var(--ink-faint);
+    }
+
+    .sg-items {
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+    }
+
+    .sg-item {
+      font-size: 12px;
+      color: var(--ink-dim);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .sg-item::before {
+      content: '→';
+      color: var(--amber);
+      font-size: 10px;
+    }
+
+    /* =================== CONTACT =================== */
+    #contact {
+      border-top: 1px solid var(--border);
+      min-height: 80vh;
+      display: flex;
+      align-items: center;
+    }
+
+    .contact-layout {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6rem;
+      align-items: center;
+      width: 100%;
+    }
+
+    .contact-headline {
+      font-family: 'Libre Baskerville', serif;
+      font-size: clamp(2rem, 4vw, 3.5rem);
+      line-height: 1.2;
+      color: var(--ink);
+    }
+
+    .contact-headline em {
+      font-style: italic;
+      color: var(--amber);
+    }
+
+    .contact-sub {
+      margin-top: 1.5rem;
+      font-size: 13px;
+      line-height: 1.9;
+      color: var(--ink-dim);
+    }
+
+    .contact-links {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      margin-top: 3rem;
+    }
+
+    .contact-link {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+      padding: 1.2rem 1.5rem;
+      border: 1px solid var(--ink-faint);
+      text-decoration: none;
+      color: var(--ink-dim);
+      transition: border-color 0.3s, color 0.3s, background 0.3s;
+      font-size: 12px;
+      letter-spacing: 0.1em;
+    }
+
+    .contact-link:hover {
+      border-color: var(--amber);
+      color: var(--amber);
+      background: var(--glow);
+    }
+
+    .contact-link-icon {
+      font-family: 'Orbitron', monospace;
+      font-size: 9px;
+      color: var(--amber);
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      min-width: 60px;
+    }
+
+    /* FOOTER */
+    footer {
+      padding: 2rem 3rem;
+      border-top: 1px solid var(--ink-faint);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 10px;
+      letter-spacing: 0.2em;
+      color: var(--ink-faint);
+      text-transform: uppercase;
+    }
+
+    /* =================== ANIMATIONS =================== */
+    @keyframes fadeUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes pulse {
+
+      0%,
+      100% {
+        opacity: 1;
+      }
+
+      50% {
+        opacity: 0.3;
+      }
+    }
+
+    @keyframes pulse-glow {
+
+      0%,
+      100% {
+        opacity: 0.5;
+      }
+
+      50% {
+        opacity: 1;
+      }
+    }
+
+    @keyframes flicker {
+
+      0%,
+      100% {
+        opacity: 0.3;
+      }
+
+      50% {
+        opacity: 0.8;
+      }
+
+      60% {
+        opacity: 0.2;
+      }
+
+      70% {
+        opacity: 0.6;
+      }
+    }
+
+    @keyframes scanline {
+      from {
+        transform: translateY(-100%);
+      }
+
+      to {
+        transform: translateY(100vh);
+      }
+    }
+
+    .scanline {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: linear-gradient(to right, transparent, rgba(201, 145, 58, 0.3), transparent);
+      animation: scanline 8s linear infinite;
+      pointer-events: none;
+      z-index: 9996;
+    }
+
+    /* REVEAL ANIMATION */
+    .reveal {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity 0.8s ease, transform 0.8s ease;
+    }
+
+    .reveal.revealed {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* EASTER EGG */
+    #easter {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      width: 12px;
+      height: 12px;
+      background: var(--ink-faint);
+      border-radius: 50%;
+      cursor: none;
+      z-index: 100;
+      transition: background 0.3s, transform 0.3s;
+    }
+
+    #easter:hover {
+      background: var(--amber);
+      transform: scale(2);
+    }
+
+    #easter-msg {
+      position: fixed;
+      bottom: 4rem;
+      right: 2rem;
+      background: var(--paper);
+      border: 1px solid var(--amber);
+      padding: 1rem 1.5rem;
+      font-size: 11px;
+      line-height: 1.7;
+      color: var(--ink-dim);
+      max-width: 280px;
+      display: none;
+      z-index: 200;
+    }
+
+    #easter-msg.show {
+      display: block;
+      animation: fadeUp 0.3s ease;
+    }
+
+    /* RANDOM QUOTE */
+    #floating-quote {
+      position: fixed;
+      bottom: 2rem;
+      left: 50%;
+      transform: translateX(-50%);
+      font-family: 'Libre Baskerville', serif;
+      font-style: italic;
+      font-size: 12px;
+      color: var(--ink-faint);
+      z-index: 100;
+      opacity: 0;
+      transition: opacity 1s;
+      text-align: center;
+      pointer-events: none;
+      max-width: 400px;
+    }
+
+    /* RESPONSIVE */
+    @media (max-width: 768px) {
+
+      .hero-grid,
+      .about-layout,
+      .research-grid,
+      .contact-layout {
+        grid-template-columns: 1fr;
+      }
+
+      .project-card.featured {
+        grid-column: span 1;
+        grid-template-columns: 1fr;
+      }
+
+      .skills-layout {
+        grid-template-columns: 1fr;
+      }
+
+      .hero-photo-wrap {
+        justify-content: center;
+      }
+
+      .hero-photo-frame {
+        width: 280px;
+        height: 360px;
+      }
+
+      nav {
+        padding: 1rem 1.5rem;
+      }
+
+      .container {
+        padding: 0 1.5rem;
+      }
+
+      .nav-links {
+        gap: 1.2rem;
+      }
+    }
+
+    .nav-logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+}
+
+.logo-svg {
+  width: 24px;
+  height: 24px;
+  color: var(--amber); /* Uses your root variable */
+  transition: transform 0.3s ease, filter 0.3s ease;
+}
+
+.nav-logo:hover .logo-svg {
+  transform: rotate(-10deg) scale(1.1);
+  filter: drop-shadow(0 0 5px var(--amber-glow));
+}
+
+.logo-dot {
+  animation: pulse 2s infinite;
+}
+  </style>
+</head>
+
+<body>
+
+  <div id="cursor"></div>
+  <div id="cursor-ring"></div>
+  <div class="scanline"></div>
+
+  <!-- NEURAL BACKGROUND -->
+  <canvas id="neural-canvas"></canvas>
+
+  <!-- ENTRY SCREEN -->
+  <div id="entry">
+    <div class="entry-glitch">[ System Initializing... ]</div>
+    <h1 class="entry-title">This is not a<br><em>portfolio.</em></h1>
+    <p class="entry-sub">You are entering a system of ideas — built by a mind that refuses to stay in one domain.</p>
+    <button class="entry-btn" id="enter-btn"><span>Enter System →</span></button>
+    <div class="entry-flicker">// scroll to navigate · click to explore</div>
+  </div>
+
+  <!-- MAIN CONTENT -->
+  <div id="main">
+
+    <!-- NAV -->
+    <nav id="nav">
+      <a href="#hero" class="nav-logo">
+    <svg class="logo-svg" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+      <path d="M8,6 C8,6 10,24 9,26 M7,16 C12,16 22,6 24,8 C26,10 14,16 14,16 C14,16 25,24 23,27" 
+            fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
+      <circle cx="26" cy="26" r="2" fill="#e8a84a" class="logo-dot" />
+    </svg>
+    <span>KK.sys</span>
+  </a>
+      <!-- <a href="#hero" class="nav-logo">KK.sys</a> -->
+      <!-- <img src="favicon.svg" alt="KK Logo" class="nav-logo-icon"> -->
+      <ul class="nav-links">
+        <li><a href="#systems">Systems</a></li>
+        <li><a href="#thinking">Thinking</a></li>
+        <li><a href="#about">About</a></li>
+        <li><a href="#research">Research</a></li>
+        <li><a href="#contact">Contact</a></li>
+      </ul>
+    </nav>
+
+    <!-- HERO -->
+    <section id="hero">
+      <div class="container">
+        <div class="hero-grid">
+          <div class="hero-left">
+            <div class="hero-tag">Creative Technologist · B.Tech IT</div>
+            <h1 class="hero-name">
+              <span class="first">Kartik</span>
+              <span class="last">Kashyap</span>
+            </h1>
+            <p class="hero-desc">
+              Building at the intersection of AI, forensics, law, education, and human behaviour.
+              Not just code — systems that think. Not just projects — explorations.
+            </p>
+            <div class="hero-tags">
+              <span class="htag">AI Systems</span>
+              <span class="htag">Digital Forensics</span>
+              <span class="htag">EdTech</span>
+              <span class="htag">Creative Coding</span>
+              <span class="htag">Policy & Law-Tech</span>
+              <span class="htag">Game Theory</span>
+            </div>
+            <div class="hero-ctas">
+              <a href="#systems" class="btn-primary">Explore Systems</a>
+              <a href="mailto:kartikkashyapworks247@gmail.com" class="btn-ghost">Get in Touch</a>
+              <a href="https://drive.google.com/file/d/1OFDpcbO9MCzEsh4FNQEB3rldPbTbbT_u/view?usp=drive_link" target="_blank" class="btn-ghost">View Resume</a>
+            </div>
+            <div class="hero-stats">
+              <div>
+                <div class="stat-num">8.87</div>
+                <div class="stat-label">CGPA</div>
+              </div>
+              <div>
+                <div class="stat-num">SAARC</div>
+                <div class="stat-label">Ex-Research Intern</div>
+              </div>
+              <div>
+                <div class="stat-num">500K+</div>
+                <div class="stat-label">Records Analysed</div>
+              </div>
+            </div>
+          </div>
+          <div class="hero-photo-wrap">
+            <div class="hero-photo-frame" id="card">
+              <div class="hero-photo-inner" id="inner">
+                <img src="kk-dp.png" alt="Kartik Kashyap"
+                  onerror="this.style.display='none'; this.parentNode.style.background='linear-gradient(135deg, #1a1508, #0a0905)'; this.parentNode.innerHTML += '<div style=\'position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:Orbitron,monospace;font-size:11px;letter-spacing:0.3em;color:var(--amber);z-index:1\'>KK</div>';">
+                <div class="hero-photo-overlay"></div>
+              </div>
+            </div>
+            <div class="hdec-wrap" style="position:absolute;inset:0;pointer-events:none;">
+              <span class="hdec hdec-1">CGPA 8.87 · GGV · 2023–</span>
+              <span class="hdec hdec-2">SAARC · RRU · NHIDE</span>
+            </div>
+
+            <div class="hero-photo-label">KK_ID_2026</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SYSTEMS / PROJECTS -->
+    <section id="systems">
+      <div class="container">
+        <div class="section-label">Systems I Build</div>
+        <h2 class="section-title reveal">Projects as<br><em style="color:var(--amber)">Explorations</em></h2>
+        <div class="projects-grid">
+
+          <!-- FEATURED: BUILD A PEN -->
+          <a href="https://build-a-pen.netlify.app" target="_blank" class="project-card featured reveal">
+            <div>
+              <div class="featured-badge">★ Featured</div>
+              <div class="project-type">Educational Experience</div>
+              <div class="project-name">Build A Pen</div>
+              <div class="project-desc">An immersive creative educational web experience exploring the engineering,
+                supply chain, and manufacturing of everyday objects. Every click unlocks a layer of reality.</div>
+              <div class="project-tags">
+                <span class="ptag">Interactive Web</span>
+                <span class="ptag">Supply Chain</span>
+                <span class="ptag">EdTech</span>
+                <span class="ptag">Creative Coding</span>
+              </div>
+              <div class="project-stat">Immersive educational storytelling through objects</div>
+              <span class="project-link">ENTER ↗</span>
+            </div>
+            <div class="featured-visual">
+              <canvas id="pen-canvas" width="400" height="200"></canvas>
+            </div>
+          </a>
+
+          <!-- P-FEICS -->
+          <a href="https://github.com/Kartik-Kashyap/forensics-criminology-tech-lab/tree/main/SECURITY-INTEGRITY/PFEICS" target="_blank" class="project-card reveal">
+            <div class="project-type">Forensic Platform</div>
+            <div class="project-name">P-FEICS v2.0</div>
+            <div class="project-desc">Psycho-Forensic Evidence Integrity and Chain-of-Custody System — court-admissible platform for BEOS,
+              SDS & EyeDetect signals with AES-256-GCM encryption and hash-chained custody logs.</div>
+            <div class="project-tags">
+              <span class="ptag">AES-256</span>
+              <span class="ptag">Cryptography</span>
+              <span class="ptag">Forensics</span>
+              <span class="ptag">Daubert</span>
+            </div>
+            <div class="project-stat">Daubert / FRE 901–902 aligned</div>
+            <span class="project-link">CASE FILE ↗</span>
+          </a>
+
+          <!-- Crime Predictor -->
+          <a href="https://github.com/Kartik-Kashyap/forensics-criminology-tech-lab/tree/main/ML-FORENSICS/Crime-Rate-Prediction-main" target="_blank" class="project-card reveal">
+            <div class="project-type">Predictive Analytics</div>
+            <div class="project-name">Crime Prediction Simulator</div>
+            <div class="project-desc">Multi-layer criminology model trained on 10 years of NCRB data. Risk scoring,
+              hotspot mapping, and predictive analytics on 500K+ records.</div>
+            <div class="project-tags">
+              <span class="ptag">ML</span>
+              <span class="ptag">NCRB Data</span>
+              <span class="ptag">QGIS</span>
+              <span class="ptag">Risk Scoring</span>
+            </div>
+            <div class="project-stat">82% prediction accuracy</div>
+            <span class="project-link">SIMULATE ↗</span>
+          </a>
+
+          <!-- Forensic Training -->
+          <a href="https://github.com/Kartik-Kashyap/forensics-criminology-tech-lab/tree/main/AI-FORENSIC-LEARNING/Forensic-Reasoning" target="_blank" class="project-card reveal">
+            <div class="project-type">AI Training & Education System</div>
+            <div class="project-name">Forensic Reasoning Trainer</div>
+            <div class="project-desc">AI-assisted investigative training with FIR structuring, uncertainty-aware
+              timelines, and cognitive <span onclick="window.location.href='https://github.com/Kartik-Kashyap/forensics-criminology-tech-lab/tree/main/SIMULATORS/Bias-Detection';" style="cursor:pointer; color:rgb(0, 144, 172); text-decoration:underline;">bias detection</span> across 12 categories, 15+ synthetic cases. And an AI-powered <span onclick="window.location.href='https\://github.com/Kartik-Kashyap/forensics-criminology-tech-lab/tree/main/AI-FORENSIC-LEARNING/Forensic-Interactive-Learning-System';" style="cursor:pointer; color:rgb(0, 144, 172); text-decoration:underline;">interactive learning system </div>
+            <div class="project-tags">
+              <span class="ptag">AI</span>
+              <span class="ptag">Bias Detection</span>
+              <span class="ptag">Simulation</span>
+            </div>
+            <div class="project-stat">200+ evidence-hypothesis data points</div>
+            <span class="project-link">TRAIN ↗</span>
+          </a>
+
+          <!-- Smart Surveillance -->
+          <a href="https://github.com/Kartik-Kashyap/forensics-criminology-tech-lab/tree/main/ML-FORENSICS/Suspect-Detection-System/SDS-With-Face-Recognition" target="_blank" class="project-card reveal">
+            <div class="project-type">Security Engineering</div>
+            <div class="project-name">Smart Surveillance Suite</div>
+            <div class="project-desc">Facial and gait recognition pipelines with probabilistic threat detection and
+             <span onclick="window.location.href='https\://github.com/Kartik-Kashyap/forensics-criminology-tech-lab/tree/main/ML-FORENSICS/Network-Anomaly-Detection-ML';" style="cursor:pointer; color:rgb(0, 144, 172); text-decoration:underline;">network anomaly detection</span> across 50+ endpoints.</div>
+            <div class="project-tags">
+              <span class="ptag">OpenCV</span>
+              <span class="ptag">Computer Vision</span>
+              <span class="ptag">Gait Analysis</span>
+            </div>
+            <div class="project-stat">95% unauthorised access identification</div>
+            <span class="project-link">SURVEIL ↗</span>
+          </a>
+
+          <!-- SAARC Systems -->
+          <a href="https://github.com/Kartik-Kashyap/SAARC-internship-research-work" target="_blank" class="project-card reveal">
+            <div class="project-type">Policy Research · AI</div>
+            <div class="project-name">SAARC Digital Citizenship Systems</div>
+            <div class="project-desc">4 systems built during SAARC internship: polarisation simulator, AI feed model,
+              regional AI assistant, and youth policy dashboard across 6 South Asian nations.</div>
+            <div class="project-tags">
+              <span class="ptag">Policy</span>
+              <span class="ptag">Simulation</span>
+              <span class="ptag">Regional AI</span>
+            </div>
+            <div class="project-stat">10K+ data points analysed</div>
+            <span class="project-link">EXPLORE ↗</span>
+          </a>
+
+          <!-- Edu Simulations -->
+          <a href="https://kyurious-lab.netlify.app/" target="_blank" class="project-card reveal">
+            <div class="project-type">EdTech · Creative</div>
+            <div class="project-name">kyurious.kids</div>
+            <div class="project-desc">Curiosity-driven educational content creator. Have alongside built 10+ interactive simulators merging technology, psychology, and science: supply
+              chain dynamics, Game Theory, Game of Life, chaos systems — all through creative code.</div>
+            <div class="project-tags">
+              <span class="ptag">EdTech</span>
+              <span class="ptag">Chaos Systems</span>
+              <span class="ptag">Manim</span>
+              <span class="ptag">Creative Code</span>
+            </div>
+            <div class="project-stat">Education through play and curiosity</div>
+            <span class="project-link">VISIT ↗</span>
+          </a>
+
+          <!-- IoT IDS
+          <a href="https://github.com/Kartik-Kashyap" target="_blank" class="project-card reveal">
+            <div class="project-type">IoT · CBDE Funded</div>
+            <div class="project-name">Intrusion Detection & Inspection</div>
+            <div class="project-desc">CBDE-funded IoT-enabled intrusion detection and conveyor-belt crack inspection
+              using image processing for industrial automation.</div>
+            <div class="project-tags">
+              <span class="ptag">IoT</span>
+              <span class="ptag">Image Processing</span>
+              <span class="ptag">Industrial</span>
+            </div>
+            <div class="project-stat">Reduces manual inspection dependency</div>
+            <span class="project-link">INSPECT ↗</span>
+          </a> -->
+
+          <a href="https://github.com/Kartik-Kashyap/forensics-criminology-tech-lab/tree/main/EMS/EMS-human-centered" target="_blank" class="project-card reveal">
+            <div class="project-type">Human-Centered Design</div>
+            <div class="project-name">Evidence Management System & BioGraph Auth</div>
+            <div class="project-desc">A human-centered EMS design principles with explainable AI improving digital forensic workflows. And AI-Enhanced Graphical Authentication with <span onclick="window.location.href='https\://github.com/Kartik-Kashyap/forensics-criminology-tech-lab/tree/main/SECURITY-INTEGRITY/Biograph-Authentication';" style="cursor: pointer; color:rgb(0, 144, 172); text-decoration: underline">Behavioral Biometrics</span>.</div>
+            <div class="project-tags">
+              <span class="ptag">EMS</span>
+              <span class="ptag">Digital Forensics</span>
+              <span class="ptag">Cybersecurity</span>
+            </div>
+            <div class="project-stat">Evidence Management & Integrity made more robust</div>
+            <span class="project-link">Study ↗</span>
+          </a>
+
+
+        </div>
+      </div>
+    </section>
+
+    <!-- THINKING LAB -->
+    <section id="thinking">
+      <div class="container">
+        <div class="section-label">Thinking Lab</div>
+        <h2 class="section-title reveal">A Network<br><em style="color:var(--amber)">of Ideas</em></h2>
+        <p style="color:var(--ink-dim);font-size:13px;line-height:1.9;max-width:500px;" class="reveal">Hover over nodes
+          to explore how ideas connect. This is how the mind actually works — not in lists, but in webs.</p>
+        <div id="graph-canvas">
+          <canvas id="thought-canvas"></canvas>
+          <div class="thought-tooltip" id="thought-tooltip"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ABOUT -->
+    <section id="about">
+      <div class="container">
+        <div class="section-label">About</div>
+        <h2 class="section-title reveal">A Student of<br><em style="color:var(--amber)">Systems</em></h2>
+        <div class="about-layout">
+          <div class="about-narrative reveal">
+            <p>I am <span class="highlight">Kartik Kashyap</span> — a pre-final year B.Tech IT student who refuses to
+              stay in one domain. Every system I build is an attempt to understand something deeper: about crime, about
+              behaviour, about how we learn, about how societies fracture and cohere.</p>
+            <p>I work at the <span class="highlight">intersection of AI and human complexity</span> — building forensic
+              platforms that must hold up in court, simulators that teach by making you feel the consequences, and tools
+              that don't just process data but respect the weight of what data represents.</p>
+            <p>When I'm not engineering systems, I'm <span class="highlight">writing scripts, studying game theory,
+                animating mathematical ideas, or building interactive stories</span> that make people look at ordinary
+              things differently. A pen. A supply chain. A crime statistic. A philosophical tension.</p>
+            <p>The goal is always the same: <span class="highlight">make the invisible, visible.</span></p>
+          </div>
+          <div class="timeline reveal">
+            <div class="timeline-item">
+              <div class="tl-date">Feb 2026–Present</div>
+              <div class="tl-role">Technical Writing Intern</div>
+              <div class="tl-org">Rashtriya Raksha University (MHA) · India</div>
+              <div class="tl-desc">Finance–law–tech content for an Institution of National Importance</div>
+            </div>
+            <div class="timeline-item">
+              <div class="tl-date">Dec 2025–Mar 2026</div>
+              <div class="tl-role">Tech Lead & Web Architect (<a href="https://nhide2026.in" target="_blank">nhide2026.in</a>)</div>
+              <div class="tl-org">NHIDE 2026 · National Entrepreneurship Hackathon</div>
+              <div class="tl-desc">Led 5+ member team, architected platform for 1K+ visitors</div>
+            </div>
+            <div class="timeline-item">
+              <div class="tl-date">Dec 2025–Jan 2026</div>
+              <div class="tl-role">Research Intern — AI & Digital Citizenship</div>
+              <div class="tl-org">SAARC Secretariat · Kathmandu</div>
+              <div class="tl-desc">4 systems built, 8 nations analysed, 10K+ data points</div>
+            </div>
+            <div class="timeline-item">
+              <div class="tl-date">2023–Present</div>
+              <div class="tl-role">B.Tech Information Technology</div>
+              <div class="tl-org">Guru Ghasidas Vishwavidyalaya (Central University)</div>
+              <div class="tl-desc">CGPA 8.87 · AI/ML, Cryptography, Computer Vision, Data Science</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- RESEARCH -->
+    <section id="research">
+      <div class="container">
+        <div class="section-label">Case Files & Evidence</div>
+        <h2 class="section-title reveal">Investigation &<br><em style="color:var(--amber)">Research</em></h2>
+        <div class="research-grid">
+          <a href="https://drive.google.com/file/d/1E_seU1JQLVfuyn8qKgpVdVxHhG7opSDF/view?usp=drive_link" target="_blank" class="case-file reveal">
+            <span class="case-status status-pub">Under <BR>Review</span>
+            <div class="case-id">CASE-01 · Criminology Conference · Mar 2026</div>
+            <div class="case-title">"End-to-End Evidentiary Integrity in Neuro-Forensic Systems"</div>
+            <div class="case-body">Primary author. Presented at the 7th International & 46th All India Criminology
+              Conference, DY Patil University, Navi Mumbai. Covers cryptographic integrity chains for neuro-forensic
+              evidence (BEOS).</div>
+          </a>
+          <a href="https://github.com/Kartik-Kashyap/SAARC-internship-research-work" target="_blank" class="case-file reveal">
+            <span class="case-status status-complete">Completed</span>
+            <div class="case-id">CASE-02 · SAARC Research · 2025–2026</div>
+            <div class="case-title">Digital Polarisation Patterns in South Asian Social Networks</div>
+            <div class="case-body">Analysis of digital citizenship and political polarisation patterns across 6 South
+              Asian countries. Built AI feed model and polarisation simulator from 10K+ data points.</div>
+          </a>
+          <a href="https://github.com/Kartik-Kashyap/forensics-criminology-tech-lab" target="_blank" class="case-file reveal">
+            <span class="case-status status-active">Active</span>
+            <div class="case-id">CASE-03 · Forensic-Crimino-Tech-Lab · 2025</div>
+            <div class="case-title">A living Forensics and Criminology research laboratory.</div>
+            <div class="case-body">Basically my messy little lab where I throw together code, forensics, criminology, maps, psychology, and random tech experiments to see what happens — <span onclick="window.location.href='https\://github.com/Kartik-Kashyap/forensics-criminology-tech-lab/tree/main/DASHBOARDS';" style="cursor:pointer; color:rgb(35, 139, 203); text-decoration:underline;">dashboards</span>, <span onclick="window.location.href='https\://github.com/Kartik-Kashyap/forensics-criminology-tech-lab/tree/main/MAPPING';" style="cursor:pointer; color:rgb(35, 139, 203); text-decoration:underline;">crime maps</span>, <span onclick="window.location.href='https://github.com/Kartik-Kashyap/forensics-criminology-tech-lab/tree/main/SIMULATORS/Crim-OS';" style="cursor:pointer; color:rgb(35, 139, 203); text-decoration:underline;">simulators</span>. It’s not polished or “production‑ready,” more like a research playground.</div>
+          </a>
+          <a href="https://www.linkedin.com/in/efsl-rru/" target="_blank" class="case-file reveal">
+            <span class="case-status status-active">Active</span>
+            <div class="case-id">CASE-04 · RRU Technology-Law Research · 2026</div>
+            <div class="case-title">Finance × Law × Technology: Intersections for National Security</div>
+            <div class="case-body">Technical content on FinTech and law intersections for Rashtriya Raksha University,
+              an Institution of National Importance under the Ministry of Home Affairs.</div>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- SKILLS -->
+    <section id="skills">
+      <div class="container">
+        <div class="section-label">Technical Stack</div>
+        <h2 class="section-title reveal">Tools of the<br><em style="color:var(--amber)">Trade</em></h2>
+        <div class="skills-layout">
+          <div class="skill-group reveal">
+            <div class="sg-label">Languages</div>
+            <div class="sg-items">
+              <div class="sg-item">Python (AI & ML)</div>
+              <div class="sg-item">C / C++</div>
+              <div class="sg-item">JavaScript (Node.js)</div>
+              <div class="sg-item">English (Proficient)</div>
+              <div class="sg-item">Hindi (Native)</div>
+            </div>
+          </div>
+          <div class="skill-group reveal">
+            <div class="sg-label">Domains</div>
+            <div class="sg-items">
+              <div class="sg-item">Security & Cryptography</div>
+              <div class="sg-item">Data Analytics</div>
+              <div class="sg-item">Computer Vision</div>
+              <div class="sg-item">QGIS / Geo-Analytics</div>
+              <div class="sg-item">Web Architecture</div>
+              <div class="sg-item">IoT Systems</div>
+            </div>
+          </div>
+          <div class="skill-group reveal">
+            <div class="sg-label">Tools & Frameworks</div>
+            <div class="sg-items">
+              <div class="sg-item">Git, Linux</div>
+              <div class="sg-item">OpenCV, Manim</div>
+              <div class="sg-item">KNIME, MySQL</div>
+              <div class="sg-item">Obsidian (Zettelkasten)</div>
+              <div class="sg-item">Research & Tech Writing</div>
+              <div class="sg-item">Creative Coding</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CONTACT -->
+    <section id="contact">
+      <div class="container">
+        <div class="contact-layout">
+          <div class="reveal">
+            <div class="section-label">Contact</div>
+            <h2 class="contact-headline">Let's build<br>something <em>strange</em><br>and important.</h2>
+            <p class="contact-sub">Open to collaborations at the edge of technology, education, cognition, and creativity. If
+              you're building something that doesn't fit neatly into one category — reach out.</p>
+          </div>
+          <div class="reveal">
+            <div class="contact-links">
+              <a href="mailto:kartikkashyapworks247@gmail.com" class="contact-link">
+                <span class="contact-link-icon">MAIL</span>
+                kartikkashyapworks247@gmail.com
+              </a>
+              <a href="https://github.com/Kartik-Kashyap" target="_blank" class="contact-link">
+                <span class="contact-link-icon">GITHUB</span>
+                github.com/Kartik-Kashyap
+              </a>
+              <a href="https://www.linkedin.com/in/kartik-kashyap-vl/" target="_blank" class="contact-link">
+                <span class="contact-link-icon">LINKEDIN</span>
+                linkedin.com/in/kartik-kashyap-vl
+              </a>
+              <a href="tel:+916205651617" class="contact-link">
+                <span class="contact-link-icon">PHONE</span>
+                +91 6205 651 617
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      <span>© 2026 Kartik Kashyap</span>
+      <span></span>
+      <span>[ KK.sys · v1.0 ]</span>
+    </footer>
+
+  </div>
+
+  <!-- EASTER EGG -->
+  <div id="easter" title="..."></div>
+  <div id="easter-msg">
+    <strong>// easter egg found</strong><br>
+    "I once built a Zettelkasten with 200+ nodes just to understand how ideas connect.<br>Turns out the map <em>is</em>
+    the territory."<br>
+    <span style="color:var(--amber);font-size:9px;letter-spacing:0.2em;">— KK, 3am</span>
+  </div>
+
+  <!-- FLOATING QUOTE -->
+  <div id="floating-quote"></div>
+  <!-- <script src="script.js"></script> -->
+  <script>
+    // CURSOR
+    const cursor = document.getElementById('cursor');
+    const ring = document.getElementById('cursor-ring');
+    let mx = 0, my = 0, rx = 0, ry = 0;
+    document.addEventListener('mousemove', e => {
+      mx = e.clientX; my = e.clientY;
+      cursor.style.left = mx + 'px';
+      cursor.style.top = my + 'px';
+    });
+    function animRing() {
+      rx += (mx - rx) * 0.12;
+      ry += (my - ry) * 0.12;
+      ring.style.left = rx + 'px';
+      ring.style.top = ry + 'px';
+      requestAnimationFrame(animRing);
+    }
+    animRing();
+
+//     // CARD TILT
+
+//    const card = document.getElementById('card');     // outer container
+// const inner = document.getElementById('inner');   // the part that tilts
+
+// if (card && inner) {
+//   card.addEventListener('mousemove', (e) => {
+//     const rect = card.getBoundingClientRect();
+
+//     // Mouse position relative to center (-1 to +1)
+//     const x = ((e.clientX - rect.left) / rect.width - 0.5) * 2;
+//     const y = ((e.clientY - rect.top) / rect.height - 0.5) * 2;
+
+//     // Rotate inner element (adjust multiplier for stronger/weaker tilt)
+//     const rotateY = x * 18;   // left-right tilt
+//     const rotateX = -y * 18;  // up-down tilt
+
+//     inner.style.transform = `rotateY(${rotateY}deg) rotateX(${rotateX}deg)`;
+//   });
+
+//   card.addEventListener('mouseleave', () => {
+//     inner.style.transform = 'rotateY(0deg) rotateX(0deg)';
+//   });
+
+//   // Optional: add a little "pop" on enter
+//   card.addEventListener('mouseenter', () => {
+//     inner.style.transition = 'transform 0.1s ease-out';
+//   });
+// }
+
+    // NEURAL BACKGROUND CANVAS
+    const bgCanvas = document.getElementById('neural-canvas');
+    const bgCtx = bgCanvas.getContext('2d');
+    let nodes = [];
+    function resizeBg() {
+      bgCanvas.width = window.innerWidth;
+      bgCanvas.height = window.innerHeight;
+    }
+    resizeBg();
+    window.addEventListener('resize', resizeBg);
+    for (let i = 0; i < 60; i++) {
+      nodes.push({
+        x: Math.random() * window.innerWidth,
+        y: Math.random() * window.innerHeight,
+        vx: (Math.random() - 0.5) * 0.4,
+        vy: (Math.random() - 0.5) * 0.4,
+        r: Math.random() * 2 + 1
+      });
+    }
+    function drawBg() {
+      bgCtx.clearRect(0, 0, bgCanvas.width, bgCanvas.height);
+      // connections
+      for (let i = 0; i < nodes.length; i++) {
+        for (let j = i + 1; j < nodes.length; j++) {
+          const dx = nodes[i].x - nodes[j].x, dy = nodes[i].y - nodes[j].y;
+          const d = Math.sqrt(dx * dx + dy * dy);
+          if (d < 160) {
+            bgCtx.beginPath();
+            bgCtx.moveTo(nodes[i].x, nodes[i].y);
+            bgCtx.lineTo(nodes[j].x, nodes[j].y);
+            bgCtx.strokeStyle = `rgba(201,145,58,${0.15 * (1 - d / 160)})`;
+            bgCtx.lineWidth = 0.5;
+            bgCtx.stroke();
+          }
+        }
+      }
+      // nodes
+      nodes.forEach(n => {
+        n.x += n.vx; n.y += n.vy;
+        if (n.x < 0 || n.x > bgCanvas.width) n.vx *= -1;
+        if (n.y < 0 || n.y > bgCanvas.height) n.vy *= -1;
+        bgCtx.beginPath();
+        bgCtx.arc(n.x, n.y, n.r, 0, Math.PI * 2);
+        bgCtx.fillStyle = 'rgba(201,145,58,0.5)';
+        bgCtx.fill();
+      });
+      requestAnimationFrame(drawBg);
+    }
+    drawBg();
+
+    // ENTRY BUTTON
+    document.getElementById('enter-btn').addEventListener('click', () => {
+      document.getElementById('entry').classList.add('exit');
+      setTimeout(() => {
+        document.getElementById('entry').style.display = 'none';
+        document.getElementById('main').classList.add('visible');
+      }, 1200);
+    });
+
+    // NAV SCROLL
+    window.addEventListener('scroll', () => {
+      const nav = document.getElementById('nav');
+      nav.classList.toggle('scrolled', window.scrollY > 50);
+    });
+
+    // REVEAL ON SCROLL
+    const revealEls = document.querySelectorAll('.reveal');
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach((e, i) => {
+        if (e.isIntersecting) {
+          setTimeout(() => e.target.classList.add('revealed'), i * 80);
+        }
+      });
+    }, { threshold: 0.1 });
+    revealEls.forEach(el => observer.observe(el));
+
+    // THOUGHT GRAPH
+    const graphWrap = document.getElementById('graph-canvas');
+    const tc = document.getElementById('thought-canvas');
+    const tt = document.getElementById('thought-tooltip');
+
+    function resizeThought() {
+      tc.width = graphWrap.offsetWidth;
+      tc.height = graphWrap.offsetHeight;
+    }
+    resizeThought();
+    window.addEventListener('resize', resizeThought);
+
+    const thoughts = [
+      { id: 0, x: 0.5, y: 0.5, label: 'Systems Thinking', body: 'Every phenomenon is a system. Understanding the relationships is more important than understanding the parts.' },
+      { id: 1, x: 0.2, y: 0.3, label: 'Cognitive Bias', body: '12 categories of investigative bias — we don\'t see reality, we construct it from expectations.' },
+      { id: 2, x: 0.8, y: 0.3, label: 'Cryptographic Trust', body: 'Trust is not a feeling. It\'s a mathematical proof. AES-256-GCM is just formalized trust.' },
+      { id: 3, x: 0.15, y: 0.7, label: 'Zettelkasten', body: '200+ interconnected notes. Ideas don\'t live in isolation — they live in relationships.' },
+      { id: 4, x: 0.85, y: 0.7, label: 'Predictive Ethics', body: '82% accuracy means 18% wrongness. Who bears the cost of that 18%? This is why AI needs law.' },
+      { id: 5, x: 0.35, y: 0.15, label: 'Game Theory', body: 'Every interaction is a game. Strategy, payoffs, equilibria — the math of human decisions.' },
+      { id: 6, x: 0.65, y: 0.15, label: 'Visual Math', body: 'Manim teaches us that mathematics isn\'t symbolic — it\'s spatial, kinetic, alive.' },
+      { id: 7, x: 0.3, y: 0.8, label: 'Digital Forensics', body: 'Evidence is only evidence if its chain of custody is unbroken. Cryptography is the new chain.' },
+      { id: 8, x: 0.7, y: 0.8, label: 'Polarisation', body: 'Algorithms don\'t just reflect society — they amplify and manufacture division.' },
+      { id: 9, x: 0.5, y: 0.25, label: 'Curiosity', body: 'The only unifying thread: asking "but why?" until the answer becomes a system.' },
+    ];
+
+    const edges = [[0, 1], [0, 2], [0, 3], [0, 4], [0, 5], [0, 6], [0, 7], [0, 8], [0, 9], [1, 7], [2, 7], [3, 9], [4, 2], [5, 9], [6, 9], [7, 4], [8, 4], [1, 3], [5, 6]];
+
+    const tCtx = tc.getContext('2d');
+    let hoveredNode = null;
+
+    function getNodePos(n) {
+      return { x: n.x * tc.width, y: n.y * tc.height };
+    }
+
+    function drawThought() {
+      tCtx.clearRect(0, 0, tc.width, tc.height);
+      // edges
+      edges.forEach(([a, b]) => {
+        const pa = getNodePos(thoughts[a]), pb = getNodePos(thoughts[b]);
+        tCtx.beginPath();
+        tCtx.moveTo(pa.x, pa.y);
+        tCtx.lineTo(pb.x, pb.y);
+        tCtx.strokeStyle = hoveredNode !== null && (hoveredNode === a || hoveredNode === b)
+          ? 'rgba(201,145,58,0.6)' : 'rgba(201,145,58,0.12)';
+        tCtx.lineWidth = hoveredNode !== null && (hoveredNode === a || hoveredNode === b) ? 1.5 : 0.8;
+        tCtx.stroke();
+      });
+      // nodes
+      thoughts.forEach((n, i) => {
+        const p = getNodePos(n);
+        const isHovered = hoveredNode === i;
+        const r = isHovered ? 10 : 6;
+        // glow
+        if (isHovered) {
+          tCtx.beginPath();
+          tCtx.arc(p.x, p.y, 20, 0, Math.PI * 2);
+          tCtx.fillStyle = 'rgba(201,145,58,0.1)';
+          tCtx.fill();
+        }
+        tCtx.beginPath();
+        tCtx.arc(p.x, p.y, r, 0, Math.PI * 2);
+        tCtx.fillStyle = isHovered ? 'rgba(201,145,58,1)' : 'rgba(201,145,58,0.5)';
+        tCtx.fill();
+        tCtx.strokeStyle = 'rgba(201,145,58,0.3)';
+        tCtx.lineWidth = 1;
+        tCtx.stroke();
+        // label
+        tCtx.fillStyle = isHovered ? '#e8dfc8' : '#8a7d65';
+        tCtx.font = `${isHovered ? 'bold ' : ''}10px "Space Mono"`;
+        tCtx.textAlign = 'center';
+        tCtx.fillText(n.label, p.x, p.y + 20);
+      });
+      requestAnimationFrame(drawThought);
+    }
+    drawThought();
+
+    tc.addEventListener('mousemove', e => {
+      const rect = tc.getBoundingClientRect();
+      const mx2 = e.clientX - rect.left;
+      const my2 = e.clientY - rect.top;
+      let found = null;
+      thoughts.forEach((n, i) => {
+        const p = getNodePos(n);
+        const d = Math.sqrt((mx2 - p.x) ** 2 + (my2 - p.y) ** 2);
+        if (d < 20) found = i;
+      });
+      hoveredNode = found;
+      if (found !== null) {
+        const n = thoughts[found];
+        const p = getNodePos(n);
+        tt.style.display = 'block';
+        tt.style.left = Math.min(p.x + 15, tc.width - 260) + 'px';
+        tt.style.top = Math.max(p.y - 60, 10) + 'px';
+        tt.innerHTML = `<strong>${n.label}</strong>${n.body}`;
+      } else {
+        tt.style.display = 'none';
+      }
+    });
+    tc.addEventListener('mouseleave', () => { hoveredNode = null; tt.style.display = 'none'; });
+
+    // PEN CANVAS (featured project visual)
+    const pc = document.getElementById('pen-canvas');
+    if (pc) {
+      const pCtx = pc.getContext('2d');
+      let t = 0;
+      function drawPen() {
+        pCtx.clearRect(0, 0, pc.width, pc.height);
+        // supply chain nodes
+        const chain = ['RAW\nMATERIALS', 'FACTORY', 'ASSEMBLY', 'QUALITY', 'RETAIL', 'PEN'];
+        const n = chain.length;
+        chain.forEach((label, i) => {
+          const x = 30 + (i / (n - 1)) * (pc.width - 60);
+          const y = pc.height / 2 + Math.sin(t * 0.02 + i * 0.5) * 15;
+          // connection
+          if (i > 0) {
+            const px2 = 30 + ((i - 1) / (n - 1)) * (pc.width - 60);
+            const py2 = pc.height / 2 + Math.sin(t * 0.02 + (i - 1) * 0.5) * 15;
+            pCtx.beginPath(); pCtx.moveTo(px2, py2); pCtx.lineTo(x, y);
+            pCtx.strokeStyle = 'rgba(201,145,58,0.4)';
+            pCtx.lineWidth = 1; pCtx.stroke();
+            // particle
+            const prog = (t * 0.005 + i * 0.17) % 1;
+            const px3 = px2 + (x - px2) * prog, py3 = py2 + (y - py2) * prog;
+            pCtx.beginPath(); pCtx.arc(px3, py3, 2, 0, Math.PI * 2);
+            pCtx.fillStyle = 'rgba(201,145,58,0.9)'; pCtx.fill();
+          }
+          pCtx.beginPath(); pCtx.arc(x, y, 8, 0, Math.PI * 2);
+          pCtx.fillStyle = 'rgba(201,145,58,0.2)'; pCtx.fill();
+          pCtx.strokeStyle = 'rgba(201,145,58,0.6)'; pCtx.lineWidth = 1; pCtx.stroke();
+          pCtx.fillStyle = 'rgba(232,223,200,0.8)';
+          pCtx.font = '8px "Space Mono"'; pCtx.textAlign = 'center';
+          label.split('\n').forEach((l, li) => pCtx.fillText(l, x, y + 22 + li * 11));
+        });
+        t++;
+        requestAnimationFrame(drawPen);
+      }
+      drawPen();
+    }
+
+    // EASTER EGG
+    const ee = document.getElementById('easter');
+    const eem = document.getElementById('easter-msg');
+    let easterClicks = 0;
+    ee.addEventListener('click', () => {
+      easterClicks++;
+      if (easterClicks === 1) eem.classList.add('show');
+      else { eem.classList.remove('show'); easterClicks = 0; }
+    });
+
+    // FLOATING QUOTES
+    const quotes = [
+      '"Every system is perfectly designed to get the results it gets." — W. Edwards Deming',
+      '"The map is not the territory." — Alfred Korzybski',
+      '"To understand is to know what to do." — Ludwig Wittgenstein',
+      '"Evidence doesn\'t speak. We speak for it. That\'s the weight." — KK',
+      '"Chaos is just order we haven\'t understood yet." — KK',
+      '"Every simulation is an argument about how the world works." — KK',
+    ];
+    let qi = 0;
+    const fq = document.getElementById('floating-quote');
+    function showQuote() {
+      fq.style.opacity = 0;
+      setTimeout(() => {
+        fq.textContent = quotes[qi++ % quotes.length];
+        fq.style.opacity = 1;
+        setTimeout(showQuote, 7000);
+      }, 500);
+    }
+    setTimeout(showQuote, 5000);
+
+    // KONAMI CODE easter egg
+    let konami = [], konamiCode = [38, 38, 40, 40, 37, 39, 37, 39, 66, 65];
+    document.addEventListener('keydown', e => {
+      konami.push(e.keyCode);
+      konami = konami.slice(-10);
+      if (konami.join(',' === konamiCode.join(','))) {
+        document.body.style.filter = 'hue-rotate(180deg)';
+        setTimeout(() => document.body.style.filter = '', 2000);
+      }
+    });
+  </script>
+</body>
+
+</html>
